@@ -168,7 +168,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 			stepLat = Double.valueOf(new JSONObject(stepEndLocation[nowStep][1]).getString("lat").toString());
 			stepLng = Double.valueOf(new JSONObject(stepEndLocation[nowStep][1]).getString("lng").toString());
 			//result_tv.setText("距離"+String.valueOf((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng))+"公尺");
-			if((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng) < 100) {
+			if((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng) < 200) {
 				if(nowStep == objNumber-1) {
 					result_tv.setText("目的地到達 !");
 				} else {
@@ -178,8 +178,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 					result_tv.setText("已到達警示「" + String.valueOf(nowStep) + "」" +
 							"跟下個警示距離"+String.valueOf((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng))+"公尺");
 					tips("到達 !");
-				} 
-			} 
+				}
+			}
+			result_dis_tv.setText("目前剩下距離：" + String.valueOf((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng))+"公尺");
 				//tips(stepIns[0]);
 				//tips(String.valueOf(new JSONObject(endLocation[0][0]).getString("lat")));
 	}
@@ -319,6 +320,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		//Location location = lms.getLastKnownLocation(bestProvider);	//選擇最佳提供者
 		tips(String.valueOf(location.getLongitude())+"  "+String.valueOf(location.getLatitude()));
 		getLocation(location);
+		markWebView(location);
 	}
 	
 	private void getLocation(Location location) throws JSONException {	//將定位資訊顯示在畫面中
