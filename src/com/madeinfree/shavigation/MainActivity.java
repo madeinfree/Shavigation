@@ -51,7 +51,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 					 result_start_location_tv,
 					 result_end_location_tv,
 					 result_steps_tv,
-					 result_steps_show_tv;
+					 result_steps_show_tv,
+					 result_dis_tv;
 	
 	//WebView
 	private static final String MAP_URL = "file:///android_asset/googleMap.html";
@@ -208,6 +209,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		
 		//TextView
 		result_tv = (TextView) findViewById(R.id.result_tv);
+		result_dis_tv = (TextView) findViewById(R.id.result_dis_tv);
 		resultContent_tv = (TextView) findViewById(R.id.resultContent_tv);
 		result_start_location_tv = (TextView) findViewById(R.id.result_start_location_tv);
 		result_end_location_tv = (TextView) findViewById(R.id.result_end_location_tv);
@@ -221,11 +223,11 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 			@Override
 			public void onClick(View arg0) {
 				/*final String origin_et_str = origin_et.getText().toString();*/
-				/*final String destination_et_str = destination_et.getText().toString();
-				if(origin_et_str.equals("") || destination_et_str.equals("")) {
+				final String destination_et_str = destination_et.getText().toString();
+				if(destination_et_str.equals("")) {
 					tips("無法搜尋空值");
 					return;
-				}*/
+				}
 				
 				//Reset
 				nowStep = 0;
@@ -237,11 +239,11 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 						try { 
 							DoInterNetConnection(path + 
 									"origin=" + nowLatitude +"," + nowLongitude +
-									"&destination=" + destination +
+									"&destination=" + destination_et_str +
 									"&language=zh-TW" +
 									"&sensor=" + sensor); 
 							String startForJs = nowLatitude + "," + nowLongitude;
-							String jsurl = "javascript:calcRoute2(\""+startForJs+"\",\"台南火車站\")"; 
+							String jsurl = "javascript:calcRoute2(\""+startForJs+"\",\""+destination_et_str	+"\")"; 
 							webView.loadUrl(jsurl); 
 						} catch (MalformedURLException e) { 
 							Log.e(TAG, "DoInterNetConnection, Error !");

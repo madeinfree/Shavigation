@@ -86,6 +86,13 @@
         android:layout_gravity="center" />
 
     <TextView
+        android:id="@+id/result_dis_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="尚未偵測"
+        android:layout_gravity="center" />
+
+    <TextView
         android:id="@+id/result_start_location_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
