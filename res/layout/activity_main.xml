@@ -1,0 +1,123 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="輸入起點、終點"
+        android:layout_gravity="center" />
+
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/origin_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="起點" />
+
+        <EditText
+            android:id="@+id/origin_et"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:hint="自動插入"
+            android:ems="10" >
+
+            <requestFocus />
+        </EditText>
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/destination_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="終點" />
+
+        <EditText
+            android:id="@+id/destination_et"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="輸入終點（中文）"
+            android:ems="10" />
+
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/tableRow3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/search_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false"
+            android:text="開始查詢路徑" />
+
+        <Button
+            android:id="@+id/doing_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="啟動GPS" />
+    </TableRow>
+
+    <TextView
+        android:id="@+id/result_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="尚未偵測"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/result_start_location_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="起始點：" />
+    
+    <TextView
+        android:id="@+id/result_end_location_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="終點：" />
+
+    <TextView
+        android:id="@+id/result_steps_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="警示次數：" />
+
+    <TextView
+        android:id="@+id/result_steps_show_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="警示地點：" />
+
+    <WebView
+        android:id="@+id/mapWebView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:id="@+id/resultContent_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="" />
+
+</LinearLayout>
