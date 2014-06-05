@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Criteria;
@@ -25,6 +26,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -58,6 +60,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	//WebView
 	private static final String MAP_URL = "file:///android_asset/googleMap.html";
     private WebView webView;
+    private boolean dataCheck = false; //確認是否有資料，觸發js
 	
 	//Default url
 	//
@@ -68,6 +71,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	
 	//Handler switch flag
 	protected static final int Result_Data = 0x1;
+	
+	//Vibrator Service
+	Vibrator myVibrator;
 	
 	//GPS Service
 	private LocationManager lms;
@@ -98,6 +104,15 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 						if(result != null) {
 							try {
 								JSONObject StoJ = new JSONObject(result);
+								if(StoJ.get("status").equals("ZERO_RESULTS")) {
+									result_step_details.setEnabled(false);
+									tips("查無資訊，請確認輸入後再重新搜尋！");
+									dataCheck = false;
+									return;
+								}
+								//讓js啟動
+								dataCheck = true;
+								//
 								JSONObject array = (JSONObject) StoJ.getJSONArray("routes").opt(0);
 								JSONObject legs = (JSONObject) array.getJSONArray("legs").opt(0);
 								JSONArray steps = (JSONArray) legs.getJSONArray("steps");
@@ -156,6 +171,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		
 		getService();
 		
+		getVibarator();
+		
 		setupWebView();
 		
 		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -169,7 +186,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 			stepLat = Double.valueOf(new JSONObject(stepEndLocation[nowStep][1]).getString("lat").toString());
 			stepLng = Double.valueOf(new JSONObject(stepEndLocation[nowStep][1]).getString("lng").toString());
 			//result_tv.setText("距離"+String.valueOf((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng))+"公尺");
-			if((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng) < 200) {
+			if((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng) < 150) {
 				if(nowStep == objNumber-1) {
 					result_tv.setText("目的地到達 !");
 				} else {
@@ -179,6 +196,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 					result_tv.setText("已到達警示「" + String.valueOf(nowStep) + "」" +
 							"跟下個警示距離"+String.valueOf((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng))+"公尺");
 					tips("到達 !");
+					myVibrator.vibrate(new long[]{10, 100, 10, 100, 10, 100}, -1);
 				}
 			}
 			result_dis_tv.setText("目前剩下距離：" + String.valueOf((int)getDistance(nowLatitude, nowLongitude, stepLat, stepLng))+"公尺");
@@ -235,19 +253,23 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 				//Reset
 				nowStep = 0;
 				
+				result_step_details.setEnabled(true);
+				
 				Thread bg_internet = new Thread(new Runnable() {
 
 					@Override
-					public void run() { 
+					public void run() {  
 						try { 
 							DoInterNetConnection(path + 
 									"origin=" + nowLatitude +"," + nowLongitude +
 									"&destination=" + destination_et_str +
 									"&language=zh-TW" +
 									"&sensor=" + sensor); 
-							String startForJs = nowLatitude + "," + nowLongitude;
-							String jsurl = "javascript:calcRoute2(\""+startForJs+"\",\""+destination_et_str	+"\")"; 
-							webView.loadUrl(jsurl); 
+							if(dataCheck) {
+								String startForJs = nowLatitude + "," + nowLongitude;
+								String jsurl = "javascript:calcRoute2(\""+startForJs+"\",\""+destination_et_str	+"\")"; 
+								webView.loadUrl(jsurl);
+							}
 						} catch (MalformedURLException e) { 
 							Log.e(TAG, "DoInterNetConnection, Error !");
 							//e.printStackTrace(); 
@@ -260,7 +282,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 							e.printStackTrace();
 						}
 					}
-					
+					 
 				}); 
 				bg_internet.start();
 			}
@@ -314,7 +336,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 				String step_details_for_dialog = "";
 				
 				for(int i = 0;i < objNumber; i++) {
-					step_details_for_dialog += stepInstructions[i] + "\n";
+					step_details_for_dialog += "["+(i+1)+"]"+stepInstructions[i] + "\n\n";
 				}
 				
 				String stepsResult_cut_b = step_details_for_dialog.replace("<b>", "");
@@ -338,10 +360,12 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	} 
 	  
 	private void getService() {
-		
-		lms = (LocationManager) getSystemService(LOCATION_SERVICE);	//取得系統定位服務
-		 
+		lms = (LocationManager) getSystemService(LOCATION_SERVICE);	//取得系統定位服務 
 	} 
+	
+	private void getVibarator() {
+		myVibrator = (Vibrator) getApplication().getSystemService(Service.VIBRATOR_SERVICE);
+	}
 	 
 	private void locationServiceInitial() throws JSONException {
 		Criteria criteria = new Criteria();	//資訊提供者選取標準
