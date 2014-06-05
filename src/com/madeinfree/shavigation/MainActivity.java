@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -44,7 +43,9 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	//Views
 	private EditText origin_et, destination_et; //起點、終點
 	
-	private Button search_btn, doing_btn;
+	private Button search_btn, 
+				   doing_btn,
+				   result_step_details;
 	
 	private TextView result_tv, 
 					 resultContent_tv,
@@ -139,7 +140,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 								e.printStackTrace();
 							}
 						}
-					break;
+					break;	
 			}
 		}
 	};
@@ -157,7 +158,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		
 		setupWebView();
 		
-		this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		//this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 	}
 	
@@ -207,6 +208,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 		//Bitton
 		search_btn = (Button) findViewById(R.id.search_btn);
 		doing_btn = (Button) findViewById(R.id.doing_btn);
+		result_step_details = (Button) findViewById(R.id.result_step_details);
 		
 		//TextView
 		result_tv = (TextView) findViewById(R.id.result_tv);
@@ -305,6 +307,34 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 				}
 			}
 		});
+		
+		result_step_details.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				String step_details_for_dialog = "";
+				
+				for(int i = 0;i < objNumber; i++) {
+					step_details_for_dialog += stepInstructions[i] + "\n";
+				}
+				
+				String stepsResult_cut_b = step_details_for_dialog.replace("<b>", "");
+				String stepsResult_cut_bb = stepsResult_cut_b.replace("</b>", "");
+				String stepsResult_cut_div = stepsResult_cut_bb.replace("<div style=\"font-size:0.9em\">", "");
+				String stepsResult_cut_div_d = stepsResult_cut_div.replace("</div>", "");
+				
+				AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+				dialog.setTitle("警示點詳細資料");
+				dialog.setMessage(stepsResult_cut_div_d);
+				dialog.setIcon(android.R.drawable.ic_dialog_alert);
+				dialog.setCancelable(false);
+				dialog.setPositiveButton("關閉", new DialogInterface.OnClickListener() {  
+				    public void onClick(DialogInterface dialog, int which) {  
+				    	
+				    }  
+				}); 
+				dialog.show();
+			}
+		});
 	} 
 	  
 	private void getService() {
@@ -316,11 +346,13 @@ public class MainActivity extends ActionBarActivity implements LocationListener 
 	private void locationServiceInitial() throws JSONException {
 		Criteria criteria = new Criteria();	//資訊提供者選取標準
 		bestProvider = lms.getBestProvider(criteria, true);	//選擇精準度最高的提供者
-		Location location = lms.getLastKnownLocation(LocationManager.GPS_PROVIDER);	//使用GPS定位座標
-		//Location location = lms.getLastKnownLocation(bestProvider);	//選擇最佳提供者
-		tips(String.valueOf(location.getLongitude())+"  "+String.valueOf(location.getLatitude()));
+		//Location location = lms.getLastKnownLocation(LocationManager.GPS_PROVIDER);	//使用GPS定位座標
+		Location location = lms.getLastKnownLocation(bestProvider);	//選擇最佳提供者
+		//tips(String.valueOf(location.getLongitude())+"  "+String.valueOf(location.getLatitude()));
 		getLocation(location);
-		markWebView(location);
+		if(location != null) {
+			markWebView(location);
+		}
 	}
 	
 	private void getLocation(Location location) throws JSONException {	//將定位資訊顯示在畫面中
